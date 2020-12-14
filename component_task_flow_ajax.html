@@ -1,0 +1,78 @@
+#set($count_row=0)
+#set ($list =
+$u.ref("crud_search_task_flow","default",["$!{id}","$!{record_per_page}","$!{page_index}"],3))
+#if ($list.size() > 0)
+#foreach ($i in $list)
+#if($!i["STEP_CODE"] == '')
+<tr class="data_null">
+    <td colspan="5" style="text-align: center;">$!i["NAME"] Chưa có Flow</td>
+</tr>
+#else
+#set($count_row=$count_row+1)
+<tr class="data_component_info_flow">
+    <td>$!i["NAME"]</td>
+    <td>$!i["DESCRIPTION"]</td>
+    <td>$!i["STEP_CODE"]</td>
+    <td>$!i["ORDER_TASK"]</td>
+    <td class="up" style="width:40px;">#if($count_row != 1) <i class="fa fa-caret-up" style="font-size: 30px;color:greenyellow;"></i> #end</td>
+    <td class="down" style="width:40px;">#if($count_row != $list.size())<i class="fa fa-caret-down" style="font-size: 30px;color:greenyellow;"></i>#end</td>
+    <td class="delete-btn"><i class="fa fa-trash" style="font-size: 30px;color:red"></i> </td>
+    <td neo-component-task_id='$!i["COMPONENT_TASK_ID"]' style="display: none;">$!i["COMPONENT_TASK_ID"]</td>
+    <td style="display: none;">$!i["ID"]</td>
+</tr>
+
+#end
+#end #else
+
+#end
+
+<script>
+    window.current_order_task = $count_row;
+    $('.data_component_info_flow').click(function () {
+        $(".data_component_info_flow").css("background-color", "white");
+        $(this).css("background-color", "#ffedba");
+
+    })
+
+    $('.delete-btn').click(function () {
+        window.delete_order_task = +$(this)[0].parentElement.children[3].innerHTML;
+        window.delete_component_task_id = $(this)[0].parentElement.children[7].innerHTML;
+        swal({
+            title: "Bạn có muốn xóa",
+            text: "Dữ liệu sẽ mất khi bạn đồng ý!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    deleteComponentFlow('component_info_flow', 'delete_component_flow_ajax.html');
+                } else {
+
+                }
+            });
+
+    })
+
+    // move up and down
+    $('.up').click(function () {
+        $('#save_change_order_btn').attr('disabled',false);
+
+        let currentElement = $(this)[0].parentElement;
+        if (currentElement.previousElementSibling) {
+            currentElement.parentElement.insertBefore(currentElement, currentElement.previousElementSibling);
+        }
+
+    })
+
+    $('.down').click(function () {
+        
+        $('#save_change_order_btn').attr('disabled',false);
+        let currentElement = $(this)[0].parentElement;
+        if (currentElement.nextElementSibling) {
+            currentElement.parentElement.insertBefore(currentElement.nextElementSibling, currentElement);
+        }
+    })
+
+    
+</script>

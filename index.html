@@ -1,0 +1,393 @@
+<style>
+    .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        margin: 50px auto;
+    }
+
+    .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #000;
+        border-color: #000 transparent #000 transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+    }
+
+    @keyframes lds-dual-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
+    .select_table_row {
+        background-color: #ffedba !important;
+    }
+
+    
+    .swal-text {
+        font-size: 16px;
+    }
+
+    .swal-title {
+        font-size: 16px;
+    }
+</style>
+<input type="hidden" id="doSearch" />
+<div class="row" id="main-content">
+    <div class="col-lg-4" id="div-service">
+        <div class="box" style="border: #f39c12 1px solid; margin-top: 10px; margin-left: 10px;">
+            <div class="box-header with-border bg-yellow">
+                <h3 class="box-title">Danh sách Component Info</h3>
+            </div>
+            <div class="form-horizontal">
+                <div class="box-body">
+                    <div class="row" id="component_info_data">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-lg-8" style="padding-right: 30px;" id="div-pkg">
+        <div class="box" id="param_form" style="border: #f39c12 1px solid; margin-top: 10px; margin-left: 10px;">
+            <div class="box-header with-border bg-yellow">
+                <h3 class="box-title">Khai báo Flow <span id="add_group_name"></span></h3>
+            </div>
+            <div class="box no-border" style="margin-top: 10px; width: 99%;">
+                <div class="form-horizontal">
+                    <div class="box-body">
+                        <form id="parame_value">
+                            <table id="menu" class='table table-condensed'>
+                                <tr>
+                                    <td style="width: 100%;">
+                                        <div class="row" role="row">
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div id="" class="col-lg-4">Step Code
+                                                        <font style="color: red">*</font>
+                                                    </div>
+                                                    <div class="col-lg-8" id="step_code_list">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <button class="btn btn-primary" type="button" id="goNew" disabled><i
+                                                            class="fa fa-plus-square"></i>
+                                                        ${n.i18n.crud_new_button_message}</button>&nbsp;
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+
+                            </table>
+                        </form>
+                        <section class="content">
+                            <div class="box box-primary">
+                                <div class="box-body no-padding"
+                                    style="text-align:center; margin:auto;padding-top: 10px !important;">
+                                    <h4>Danh sách Component Flow </h4>
+                                    <table id="paramerter_id" class="table table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr id="pkg-search">
+                                                <th>
+                                                    Component Info Name
+                                                </th>
+                                                <th style="display: none;"></th>
+                                                <th>
+                                                    Description
+                                                </th>
+                                                <th>
+                                                    Step Code
+                                                </th>
+                                                <th>
+                                                    Order Task
+                                                </th>
+                                                <th colspan="3">
+                                                    Action
+                                                </th>
+                                                <th hidden>
+                                                    Component Task Id
+                                                </th>
+                                                <th hidden>
+                                                    ID
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="component_info_flow_list"></tbody>
+                                    </table>
+                                    <div id="component_info_flow_loading" style="display:none;text-align: center;">
+                                    </div>
+                                </div>
+
+                                <div id="parameter_pagingnation" style="text-align: center; padding-top: 10px;"></div>
+                            </div>
+                            <div style="text-align: center;">
+                                <button class="btn btn-success" id="save_change_order_btn" disabled>Lưu</button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- popup -->
+<div class="modal fade in" id="myModal"
+    style="display: none;position: fixed; margin: auto; width: 100%; height: 100%; overflow:hidden; ">
+    <div class="modal-dialog" style="margin:auto; width: 40%; height: 100%;">
+        <div class="modal-header bg-yellow" style="height: 50px;">
+            <h4 style="display: inline;">Khai báo nhóm tham số</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+            <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-content">
+            <form id="group_value" style="padding: 15px;">
+                <table id="menu" class='table table-condensed'>
+                    <tr>
+                        <td>
+                            <div>
+                                <div>
+                                    <div class="row">
+                                        <div id="" class="col-lg-4">Tên nhóm
+                                            <font style="color: red">*</font>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <input autocomplete="off" type="text"
+                                                neo-validate='["Tên nhóm","noempty|length:20"]' class="form-control"
+                                                name="group_name" id="group_name" maxlength="51">
+                                            <span id="add_group_code_msg" class="err_msg"></span>
+                                            <p id="group_name_error" style="display:none;color:red;"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <div>
+                                    <div class="row">
+                                        <div id="" class="col-lg-4">Mô tả
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <input autocomplete="off" type="text"
+                                                neo-validate='["Mô tả","length:200|specials"]' class="form-control"
+                                                name="group_desciption" id="group_desciption" maxlength="51">
+                                            <span id="add_group_code_msg" class="err_msg"></span>
+
+                                            <p id="group_description_error" style="display:none;color:red;"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <input type="hidden" class="form-control" name="group_id" id="group_id">
+
+                    <tr id='control'>
+                        <td colspan='10' align='center'>
+                            <font id="result"></font>
+                            <button class="btn btn-success" type="button" name="save_new_group" id="save_new_group"
+                                style="display: none;"><i class="fa fa-check-circle-o"></i> Đồng ý</button>&nbsp;
+
+                            <button class="btn btn-success" name="gosave_edit_ext" type="button"
+                                id="gosave_edit_ext_group" style="display: none;"><i class="fa fa-check-circle-o"></i>
+                                Đồng ý</button>&nbsp;
+                            <button class="btn btn-default" name="goback_new_ext" id="goback_new_ext_group"
+                                style="display: none;" data-dismiss="modal"><i class="fa fa-arrow-circle-left"></i> Quay
+                                lại</button>
+                            <button class="btn btn-default" name="goback_edit_ext" id="goback_edit_ext_group"
+                                style="display: none;" data-dismiss="modal"><i class="fa fa-arrow-circle-left"></i> Quay
+                                lại</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script type="text/javascript">
+    var curr_page = 1;
+    localStorage.setItem('page_rec', 10);
+    var itemPerpage = (localStorage.getItem('page_rec') == null ? 10 : localStorage.getItem('page_rec'));
+    var itemPerpage;
+
+
+    function gotoPage(p) {
+        curr_page = p;
+        $('#doSearch').trigger('click', '1');
+    }
+
+    function getComponentInfoList(data) {
+        // spinner
+        var isLoading = true;
+        if (isLoading) {
+            $('#component_info_data').css('text-align', 'center');
+            $('#component_info_data').html('<div class="lds-dual-ring"></div>');
+        }
+
+
+        let params = '';
+        if (arguments.length > 3) {
+            for (let i = 4; i < arguments.length; i++) {
+                params += '&' + arguments[i] + '=' + $('#' + arguments[i]).val();
+            }
+        }
+
+        // argument1= template folder, argument 2= ajax page, argument 3= record_per+page, argument 4= current page
+        //ajax
+        $.ajax({
+            url: 'crud_exec.jsp?crud_type=' + arguments[0] + '/' + arguments[1] + '&record_per_page=' + arguments[2] + '&page_index=' + arguments[3] + ''
+                + params
+            ,
+            success: function (data) {
+                isLoading = false;
+                $('#component_info_data').html(data);
+            }
+        })
+    }
+
+
+    function getComponentInfoTaskList(data) {
+        // spinner
+        var isLoading = true;
+        if (isLoading) {
+            $('#component_info_flow_loading').css('display', 'block');
+            $('#component_info_flow_loading').html('<div style="text-align:center;" class="lds-dual-ring"></div>');
+            $('#component_info_flow_list').hide();
+        }
+
+        // argument1= template folder, argument 2= ajax page, argument 3= record_per+page, argument 4= current page
+        //ajax
+        $.ajax({
+            url: 'crud_exec.jsp?crud_type=' + arguments[0] + '/' + arguments[1] + '&record_per_page=' + arguments[2] + '&page_index=' + arguments[3] + ''
+                + '&id=' + window.component_info_id
+            ,
+            success: function (data) {
+                isLoading = false;
+                $('#component_info_flow_loading').css('display', 'none');
+                $('#component_info_flow_list').show();
+                $('#component_info_flow_list').html(data);
+            }
+        })
+    }
+
+    function getStepCodeList(data) {
+        // argument1= template folder, argument 2= ajax page, argument 3= record_per+page, argument 4= current page
+        //ajax
+        $.ajax({
+            url: 'crud_exec.jsp?crud_type=' + arguments[0] + '/' + arguments[1] + '&record_per_page=' + arguments[2] + '&page_index=' + arguments[3] + ''
+                + '&id=1'
+            ,
+            success: function (data) {
+                $('#step_code_list').html(data);
+            }
+        })
+    }
+
+    function insertComponentFlow(data) {
+        let exec_cmd = 'crud_exec.jsp?crud_type=' + arguments[0] + '/' + arguments[1] + ''
+            + '&component_info_id=' + window.component_info_id
+            + '&component_task_id=' + window.component_task_id
+            + '&order_task=' + (current_order_task + 1);
+            + '&id=500'
+        // argument1= template folder, argument 2= ajax page, argument 3= record_per+page, argument 4= current page
+        //ajax
+        $.ajax({
+            url: exec_cmd
+            ,
+            success: function (data) {
+                if (data == 1) {
+                    swal({
+                        title: "Thêm Thành Công",
+                        text:"",
+                        icon: "success",
+                        button: "OK!",
+                    }).then(()=>{
+                        getComponentInfoTaskList('component_info_flow','component_task_flow_ajax.html',500,1);
+                    });
+                } else {
+                    swal({
+                        title: "Có lỗi xảy ra vui lòng thử lại",
+                        text: "",
+                        icon: "error",
+                        button: "OK!",
+                    }).then(()=>{
+                        
+                    });
+                }
+            }
+        })
+    }
+
+    function deleteComponentFlow(data) {
+        let exec_cmd = 'crud_exec.jsp?crud_type=' + arguments[0] + '/' + arguments[1] + ''
+            + '&component_info_id=' + window.component_info_id
+            + '&component_task_id=' + window.delete_component_task_id
+            + '&order_task=' + window.delete_order_task;
+        // argument1= template folder, argument 2= ajax page, argument 3= record_per+page, argument 4= current page
+        //ajax
+        $.ajax({
+            url: exec_cmd
+            ,
+            success: function (data) {
+                if (data == 1) {
+                    swal({
+                        title: "Xóa Thành Công",
+                        text:"",
+                        icon: "success",
+                        button: "Đồng ý!",
+                    }).then(()=>{
+                        getComponentInfoTaskList('component_info_flow','component_task_flow_ajax.html',500,1);
+                    });
+                } else {
+                    swal({
+                        title: "Có lỗi xảy ra vui lòng thử lại",
+                        text: "",
+                        icon: "error",
+                        button: "Đồng ý!",
+                    }).then(()=>{
+                        
+                    });
+                }
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        getStepCodeList('component_info_flow', 'step_code_list_ajax.html', 500, 1);
+        $('#doSearch').click(() => {
+            itemPerpage = localStorage.getItem('page_rec');
+            getComponentInfoList('component_info_flow', 'component_search_ajax.html', itemPerpage, curr_page);
+        });
+
+        $('#doSearch').click();
+
+
+        $('#goNew').click(() => {
+            insertComponentFlow('component_info_flow', 'insert_component_flow_ajax.html');
+        })
+
+
+    })
+</script>

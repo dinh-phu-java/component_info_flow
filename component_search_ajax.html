@@ -1,0 +1,148 @@
+<div class="col-lg-12">
+
+
+    <table id="tbl_data" class="table no-footer" style="width:100%">
+
+        <tr role="row" id="group_search">
+            <th>ID</th>
+            <th>
+                Name
+                <input type="text" name="name_input" data-neo="input-toggle-disable" id="name_input"
+                    onclick="javascript:{event.stopPropagation();}" style="width:100%">
+            </th>
+            <th>
+                State
+                <select class="form-control" id="state_input" name="state_input"
+                    neo-validate='["Kiêu tham số","noempty|number|specials"]' id="param_type">
+                    <option value="">Chọn
+                    </option>
+                    <option value="0">Không hoạt động</option>
+                    <option value="1">Hoạt động</option>
+                    <!-- <option value="3">Audio</option>
+                <option value="4">Call forward</option> -->
+                </select>
+            </th>
+            <th>
+                Description
+                <input type="text" name="description_search_input" data-neo="input-toggle-disable"
+                    id="description_input" onclick="javascript:{event.stopPropagation();}" style="width:100%">
+            </th>
+        </tr>
+
+        #set ($list =
+        $u.ref("crud_search_component_info_service","default",["$!{id}","$!{name}","$!{url_logic}","$!{version}","$!{state}","$!{edit_user}","$!{create_date}","$!{last_update}","$!{description}","$!{component_type_id}","$!{script_type_id}","$!{page_index}","$!{record_per_page}"],13)
+        )
+        #if ($list.size() > 0)
+        #foreach ($i in $list)
+        <tr class="data_tr">
+            <td name='component_info_id'>$!i["ID"]</td>
+            <td name='component_info_name'>$!i["NAME"]</td>
+            <td name='component_info_state' neo-state='$!i["STATE"]'>
+                #if( $!i["STATE"] == 0)
+                Không hoạt động
+                #end
+                #if( $!i["STATE"] == 1)
+                Hoạt động
+                #end
+            </td>
+            <td name='component_info_description'>$!i["DESCRIPTION"]</td>
+        </tr>
+        #end #else
+
+        #end
+
+    </table>
+</div>
+<div class="col-lg-12" id="pagination_group" style="text-align: center; margin-bottom: 5px;">
+    <div class="rec_sel">
+        <span>Hiển thị:</span>
+        <select class="form-control" style="width: 60px;float: left;"
+            onchange="localStorage.setItem('page_rec',this.value);$('#doSearch').click();itemPerpage=this.value"
+            id="cboSetPageRec" name="PageRec">
+            <option value="2">2</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="1000">1000</option>
+        </select>
+        <span>&nbsp;bản ghi</span>
+    </div>
+    <div id="pn2"></div>
+</div>
+
+<script>
+
+#set($list1 = $u.ref("crud_search_component_info_service", "default", ["$!{id}", "$!{name}", "$!{url_logic}", "$!{version}", "$!{state}", "$!{edit_user}", "$!{create_date}", "$!{last_update}", "$!{description}", "$!{component_type_id}", "$!{script_type_id}", "-1", "$!{record_per_page}"], 13))
+#foreach($i in $list1)
+    var nop = $!i["NOP"];
+    var nor = $!i["NOR"];
+#end
+
+    var totalCount = nor;
+    var totalPage = Math.ceil(totalCount / itemPerpage);
+
+    var pnhtml = '';
+    if (totalPage > 1) {
+        pnhtml = '<div style="text-align: right;">';
+        pnhtml += '<div class="form-inline" style="display: inline-block;vertical-align: middle;"><span class="total_rec"></span>&nbsp; &nbsp;';
+        pnhtml += '</div>';
+        pnhtml += '	<ul class="pagination pagination-sm" style="vertical-align: middle;padding-left: 10px;margin: 0px;">';
+        //totalPage = totalPage>5?5:totalPage;
+        if (curr_page > 3)
+            pnhtml += '<li><a href="javascript:gotoPage(1)">|&lt;</a></li>';
+        if (curr_page > 1)
+            pnhtml += '<li><a href="javascript:gotoPage(' + (curr_page - 1) + ')">&lt;</a></li>';
+        for (var i = 1; i <= totalPage; i++) {
+            if (i < curr_page - 3) {
+                i = curr_page - 3;
+                pnhtml += '<li><a id="p_fist" href="javascript:gotoPage(' + i + ')">' + i + '</a></li>';
+                continue;
+            }
+            if (i >= curr_page + 2) {
+                if (i < totalPage) {
+                    i = curr_page + 2;
+                    pnhtml += '<li><a id="p_fist" href="javascript:gotoPage(' + i + ')">' + i + '</a></li>';
+                }
+                break;
+            }
+            if (i != curr_page)
+                pnhtml += '<li><a id="p_fist" href="javascript:gotoPage(' + i + ')">' + i + '</a></li>';
+            else
+                pnhtml += '<li class="active"><a>' + i + '</a></li>';
+        }
+        if (curr_page < totalPage) {
+            pnhtml += '<li><a href="javascript:gotoPage(' + (curr_page + 1) + ')">&gt;</a></li>';
+            pnhtml += '<li><a href="javascript:gotoPage(' + totalPage + ')">&gt;|</a></li>';
+        }
+
+        pnhtml += '	</ul>';
+        pnhtml += '</div>';
+    }
+    if (totalPage == 1) {
+        curr_page = totalPage;
+    }
+    $('#pn1').html(pnhtml.replace(new RegExp("pn_id", "g"), "page1"));
+    $('#pn1 span').text('Tổng trang: ' + totalPage + ', tổng bản ghi: ' + totalCount);
+    $('#pn2').html(pnhtml.replace(new RegExp("pn_id", "g"), "page2")); $('#cboSetPageRec option[value="$!{record_per_page}"]').prop('selected', true);
+    if (totalPage == 1) {
+        curr_page = totalPage;
+    }
+
+    
+    $(".data_tr").click(function () {
+        $(".data_tr").css("background-color", "white");
+        $(this).css("background-color", "#ffedba");
+        window.component_info_id= +$(this)[0].children[0].innerHTML;
+        
+        $('#step_code_option').attr('disabled',false);
+        getComponentInfoTaskList('component_info_flow','component_task_flow_ajax.html',500,1);
+    });
+
+
+
+    
+
+</script>

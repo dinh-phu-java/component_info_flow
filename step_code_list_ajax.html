@@ -1,0 +1,24 @@
+<select class="form-control" id="step_code_option" disabled>
+    <option value="">-- Hãy chọn --</option>
+#set ($list =
+$u.ref("crud_get_step_code_list","default",["$!{id}"],1)
+)
+#if ($list.size() > 0)
+#foreach ($i in $list)
+    <option value='$!i["ID"]'>$!i["STEP_CODE"]</option>
+#end #else
+#end
+</select>
+
+<script>
+    $('#step_code_option').change(function(){
+        
+        window.component_task_id= +$(this).val();
+        if($(this).val()){
+            $('#goNew').attr('disabled',false);
+        }else{
+            $('#goNew').attr('disabled',true);
+        }
+        
+    })
+</script>
